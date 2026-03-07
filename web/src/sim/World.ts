@@ -11,6 +11,7 @@ export class World {
   vision: Vision
   private scene: THREE.Scene
   private renderer: THREE.WebGLRenderer
+  private burgers: THREE.Object3D[] = []
 
   constructor(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
     this.scene = scene
@@ -48,6 +49,7 @@ export class World {
     model.position.set(x, 0, z)
     model.traverse(n => { if (n instanceof THREE.Mesh) n.castShadow = true })
     this.scene.add(model)
+    this.burgers.push(model)
     return model
   }
 
@@ -63,6 +65,8 @@ export class World {
   reset() {
     for (const robot of this.robots.values()) this.scene.remove(robot.group)
     this.robots.clear()
+    for (const b of this.burgers) this.scene.remove(b)
+    this.burgers = []
     this.vision.reset()
     nextRobotId = 1
     nextCamId = 1
