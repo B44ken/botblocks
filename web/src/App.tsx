@@ -14,7 +14,7 @@ function stopLoop() {
 
 export default () => {
   const [code, setCode] = useState<string | null>()
-  const [errs, setErrs] = useState<string[]>([])
+  const [err, setErr] = useState<string[]>([])
   const simRef = useRef<Sim | null>(null)
   const restartRef = useRef<() => void>(() => { })
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -30,12 +30,12 @@ export default () => {
   const pushErr = (stage: string, err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err)
     console.error(`[demo] python error during ${stage}`, err)
-    setErrs(prev => [...prev, msg])
+    setErr(prev => [...prev, msg])
   }
 
   const restart = async () => {
     if (!simRef.current || !code) return
-    setErrs([])
+    setErr([])
     stopLoop()
     simRef.current.reset()
     simRef.current.start()
@@ -63,7 +63,7 @@ export default () => {
       }
       raf = window.requestAnimationFrame(frame)
     }
-    raf = window.requestAnimationFrame(frame)
+    frame()
   }
   restartRef.current = restart
   return <App width={1000}>
@@ -78,8 +78,8 @@ export default () => {
       <Card p={0} gap={0}>
         <Row p={2}>
           <Muted grow>simulator</Muted>
-          {errs.length > 0 && <Popover p={0} text={errs.map(t=><Code>{t}</Code>)}>
-	    <Btn sm color='red'>error</Btn>
+          {err.length > 0 && <Popover p={0} text={err.map(e=><Code>{e}</Code>)}>
+              <Btn sm color='red'>error</Btn>
           </Popover>}
         </Row>
         <SimView simRef={simRef} />
@@ -88,21 +88,12 @@ export default () => {
 
     <Md># overview</Md>
     <Grid cols={2}> {/* todo add api overview */}
-      <Col gap={0}> <b>bk.SimWorld(objects)</b> The simulator. Takes in objects, or use SimWorld.add(object)</Col>
-      <Col gap={0}> <b>bk.SimRobot(template)</b> Define an extensible robot, optionally from a template. </Col>
-      <Col gap={0}> <b>bk.Motor(robot, name)</b> Basic motor block.</Col>
-      <Col gap={0}> <b>bk.Camera(robot)</b> Basic camera block.</Col>
+      <Col gap={0}> <b>bk.SimWorld(objects)</b> the simulator. takes in objects, or use SimWorld.add(object)</Col>
+      <Col gap={0}> <b>bk.SimRobot(template)</b> define an extensible robot, optionally from a template. </Col>
+      <Col gap={0}> <b>bk.Motor(robot, name)</b> basic motor block.</Col>
+      <Col gap={0}> <b>bk.Camera(robot)</b> basic camera block.</Col>
       <Col gap={0}> <b>bk.cv.YOLO(frame)</b> YOLO is an object detection model, one of many supported.</Col>
-      <Col gap={0}> <b>bk.Burger(x, y)</b> Place a burger somewhere for testing, random by default.</Col>
+      <Col gap={0}> <b>bk.Burger(x, y)</b> place a burger somewhere for testing, random by default.</Col>
     </Grid>
-
-    <Md>
-      {`# but why?
-- \\- other robotics platforms (like ROS...) are annoying to set up
-- \\- many researchers avoid simulation entierly because it's too much of a hassle
-- \\- there's little standardization: no guarantee your sim robot will even work in real life
-- \\- modern features like AI should be first-class citizens
-- \\- clearly, we need a platform to make this stuff easy, while offering standard blocks for common tasks...`}
-    </Md>
   </App>
 }

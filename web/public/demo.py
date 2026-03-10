@@ -1,9 +1,8 @@
 import botblocks as bk
 
-bot = bk.Robot('SimpleCar')
+bot = bk.Robot('car_template')
 bot.attach('cam', bk.Camera())
 sim = bk.Simulator([bot, bk.Burger()])
-
 yolo = bk.cv.YOLO()
 
 def loop():
